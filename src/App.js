@@ -61,6 +61,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <div className="logo-container">
+          <img className="image-logo" src="https://i.imgur.com/rX2t7u3.jpg" alt="" width="600" height="108" />
+          <img className="image-chains" src="https://i.imgur.com/MnM2Oi3.jpg" alt="" width="600" height="106" />
+        </div>
+        
         <div className="configs-container">
           <div className="config-wrapper">
             <p>Torn API: </p>
@@ -75,7 +80,7 @@ class App extends Component {
             Save Config
           </button>
         </div>
-
+        
         <div className="main">
           {this.state.timeout ? 
               <CountDown timeout={this.state.timeout} />

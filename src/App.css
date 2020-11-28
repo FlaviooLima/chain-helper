@@ -4,6 +4,19 @@
   height: 100vh;
   flex-direction: column;
   background-color: darkslategray;
+  overflow: hidden;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+@media only screen and (max-width: 1000px) {
+  .logo-container {
+    display: none;
+  }
 }
 
 .configs-container {
