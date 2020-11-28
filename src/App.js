@@ -39,8 +39,8 @@ class App extends Component {
             this.errorHandler(response.error.error)
             return;
           }
-
-          this.setState({ timeout: response.chain.timeout }, this.getData);  
+          // minus 10 has a safenet since the torn api doesn't give an exact timer
+          this.setState({ timeout: response.chain.timeout - 10 }, this.getData);  
         });
       }).catch(err => this.errorHandler(err));
     },( forceStart ? 100 : this.state.interval*1000))
