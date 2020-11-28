@@ -1,47 +1,86 @@
 import React, { Component } from "react"
-import logo from "./logo.svg"
 import "./App.css"
-
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
-  }
-
-  handleClick = api => e => {
-    e.preventDefault()
-
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
-
-  render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
-}
+import CountDown from "./components/countdown/countdown";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    const apiKey = localStorage.getItem("apiKey");
+
+    this.state = {
+      apiKey: apiKey ? apiKey : "",
+      timeout: null,
+      interval: 10
+    };
+
+    this.timeout = null;
+  }  
+
+  componentDidMount= () => {
+    this.getData(true);
+  }
+
+  handleChangeApi = (event) => {
+    this.setState({apiKey: event.target.value});
+  };
+
+  getData = async (forceStart = false) => {
+    if(!this.state.apiKey.length){
+      return;
+    }
+    
+    this.timeout = setTimeout(()=>{
+      fetch(`https://api.torn.com/faction/?selections=chain&key=${this.state.apiKey}`)
+      .then(res => res.json())
+      .then(response => {
+        this.setState({ timeout: null}, ()=>{
+          
+          if(response.error){
+            this.errorHandler(response.error.error)
+            return;
+          }
+
+          this.setState({ timeout: response.chain.timeout }, this.getData);  
+        });
+      }).catch(err => this.errorHandler(err));
+    },( forceStart ? 100 : this.state.interval*1000))
+  }
+
+  errorHandler = (errorMessage) => {    
+    this.setState({ apiKey: ""});
+    localStorage.removeItem("apiKey");
+    alert(errorMessage);
+  }
+
+  onSaveConfig= () =>{
+    clearTimeout(this.timeout);
+    this.getData(true);
+    localStorage.setItem("apiKey", this.state.apiKey);
+  }
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
+        <div className="configs-container">
+          <div className="config-wrapper">
+            <p>Torn API: </p>
+            <input placeholder="torn api" type="password" value={this.state.apiKey} onChange={this.handleChangeApi} />
+          </div>
+          <div className="config-wrapper">
+            <p>Refresh interval per seconds: </p>
+            <input type="text" disabled value={this.state.interval}/>
+          </div>
+
+          <button onClick={this.onSaveConfig}>
+            Save Config
+          </button>
+        </div>
+
+        <div className="main">
+          {this.state.timeout ? 
+              <CountDown timeout={this.state.timeout} />
+          : null}
+        </div>
       </div>
     )
   }

@@ -1,0 +1,20 @@
+.timer-container {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+}
+
+.timer-container > .timer {
+    font-size: 16vw;
+    line-height: 10vw;
+    color: white;
+}
+
+.timer-container > .timer.yellow-warning {
+    color: yellow;
+}
+
+.timer-container > .timer.red-warning {
+    color: red;
+}
